@@ -23,74 +23,83 @@
  */
 
 function PunchClock() {
-	this.isRunning = false;
-	this.lastTime = 0;
-	this.startTime = 0;
-	this.time = 0;
-	this.element = 0;
-	this.timeElement = 0;
-	this.intervalID = 0;
-	this.Start = function () {
-		if (!this.isRunning) {
-			this.startTime = Date.now();
-			this.isRunning = true;
-			this.intervalID = setInterval($.proxy(this.Update, this), 1);
-		} else {
-			console.log('Clock is already running!');
-		}
-	};
-	this.Stop = function () {
-		clearInterval(this.intervalID);
-		this.isRunning = false;
-		this.lastTime = this.time;
-		console.log('stopped');
-	};
-	this.Update = function () {
-		if (this.isRunning) {
-			var curTime = Date.now();
-			this.time = curTime - this.startTime + this.lastTime;
-			var date = new Date(this.time),
-				hours = date.getUTCHours(),
-				minutes = date.getUTCMinutes(),
-				seconds = date.getUTCSeconds(),
-				millis = date.getUTCMilliseconds();
-			var hoursStr = hours > 9 ? hours : '0' + hours,
-				minutesStr = minutes > 9 ? minutes : '0' + minutes,
-				secondsStr = seconds > 9 ? seconds : '0' + seconds,
-				millisStr = millis > 99 ? millis : millis > 9 ? '0' + millis : '00' + millis;
-			this.timeElement.text(hoursStr + ':' +
-			                      minutesStr + ':' +
-			                      secondsStr + '.' +
-			                      millisStr);
-		}
-	};
-	this.Reset = function () {
-		this.Stop();
-		this.lastTime = 0;
-		this.time = 0;
-		this.startTime = 0;
-		this.timeElement.text("00:00:00.000");
-	};
+    "use strict";
+    this.isRunning = false;
+    this.lastTime = 0;
+    this.startTime = 0;
+    this.time = 0;
+    this.element = null;
+    this.timeElement = 0;
+    this.intervalID = 0;
+    this.Reset = function () {
+        this.Stop();
+        this.lastTime = 0;
+        this.time = 0;
+        this.startTime = 0;
+        this.timeElement.firstChild.nodeValue = "00:00:00.000";
+    };
+    this.Start = function () {
+        if (!this.isRunning) {
+            this.startTime = Date.now();
+            this.isRunning = true;
+            this.intervalID = setInterval(this.Update.bind(this), 1);
+        }
+    };
+    this.Update = function () {
+        if (this.isRunning) {
+            var curTime = Date.now();
+            this.time = curTime - this.startTime + this.lastTime;
+            var date = new Date(this.time), hours = date.getUTCHours(),
+                minutes = date.getUTCMinutes(),
+                seconds = date.getUTCSeconds(),
+                millis = date.getUTCMilliseconds();
+            var hourStr = hours > 9 ? hours : '0' + hours,
+                minsStr = minutes > 9 ? minutes : '0' + minutes,
+                secsStr = seconds > 9 ? seconds : '0' + seconds,
+                milsStr;
+            if (millis > 99) {
+                milsStr = millis;
+            } else if (millis > 9) {
+                milsStr = '0' + millis;
+            } else {
+                milsStr = '00' + millis;
+            }
+            this.timeElement.firstChild.nodeValue = hourStr + ':' + minsStr + ':' + secsStr + '.' + milsStr;
+        }
+    };
+    this.Stop = function () {
+        clearInterval(this.intervalID);
+        this.isRunning = false;
+        this.lastTime = this.time;
+    };
+    this.Delete = function () {
+        this.Stop();
+        this.element.parentNode.removeChild(this.element);
+    };
 }
 
-$(function () {
-	var nextClockID = 0;
-	var clockTemplate = $('#clock-template');
-	var clocksContainer = $('#clocks');
-	$('#clock-add').click(function () {
-		// Copy clock-template
-		var newClockElement = clockTemplate.clone().appendTo(clocksContainer).hide();
-		// Change its clock id
-		newClockElement.attr("id", "clock-" + ++nextClockID);
-		// Unhide it
-		newClockElement.show();
-		// Create new Clock obj
-		var ClockObj = new PunchClock();
-		ClockObj.element = newClockElement;
-		ClockObj.timeElement = newClockElement.find('.clock-time');
-		ClockObj.Reset();
-		ClockObj.element.find('.clock-start').click($.proxy(ClockObj.Start, ClockObj));
-		ClockObj.element.find('.clock-stop').click($.proxy(ClockObj.Stop, ClockObj));
-		ClockObj.element.find('.clock-reset').click($.proxy(ClockObj.Reset, ClockObj));
-	});
-});
+//document.addEventListener('DOMContentLoaded',function() {
+window.onload = function () {
+    "use strict";
+    var nextClockID = 0,
+        clockTemplate = document.getElementById('clock-template'),
+        clocksContainer = document.getElementById('clocks');
+    document.getElementById('clock-add').onclick = function () {
+        // Copy clock-template
+        var newClockElement = clockTemplate.cloneNode(true);
+        clocksContainer.appendChild(newClockElement);
+        // Change its clock id
+        newClockElement.setAttribute("id", "clock-" + (++nextClockID));
+        // Unhide it
+        newClockElement.style.display = '';
+        // Create new Clock obj
+        var ClockObj = new PunchClock();
+        ClockObj.timeElement = newClockElement.getElementsByClassName('clock-time')[0];
+        ClockObj.Reset();
+        newClockElement.getElementsByClassName('clock-start')[0].onclick = ClockObj.Start.bind(ClockObj);
+        newClockElement.getElementsByClassName('clock-stop')[0].onclick = ClockObj.Stop.bind(ClockObj);
+        newClockElement.getElementsByClassName('clock-reset')[0].onclick = ClockObj.Reset.bind(ClockObj);
+        newClockElement.getElementsByClassName('clock-delete')[0].onclick = ClockObj.Delete.bind(ClockObj);
+        ClockObj.element = newClockElement;
+    };
+};
