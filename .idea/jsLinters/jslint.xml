@@ -6,7 +6,8 @@
     <option indent="4" />
     <option maxerr="50" />
     <option maxlen="80" />
-    <option predef="Element" />
+    <option plusplus="true" />
+    <option predef="Element, $" />
     <option vars="true" />
   </component>
 </project>

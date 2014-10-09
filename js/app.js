@@ -36,7 +36,7 @@ function PunchClock() {
         this.lastTime = 0;
         this.time = 0;
         this.startTime = 0;
-        this.timeElement.firstChild.nodeValue = "00:00:00.000";
+        this.timeElement.text("00:00:00.000");
     };
     this.Start = function () {
         if (!this.isRunning) {
@@ -64,7 +64,7 @@ function PunchClock() {
             } else {
                 milsStr = '00' + millis;
             }
-            this.timeElement.firstChild.nodeValue = hourStr + ':' + minsStr + ':' + secsStr + '.' + milsStr;
+            this.timeElement.text(hourStr + ':' + minsStr + ':' + secsStr + '.' + milsStr);
         }
     };
     this.Stop = function () {
@@ -74,32 +74,32 @@ function PunchClock() {
     };
     this.Delete = function () {
         this.Stop();
-        this.element.parentNode.removeChild(this.element);
+        this.element.remove();
     };
 }
 
-//document.addEventListener('DOMContentLoaded',function() {
-window.onload = function () {
+$(function () {
     "use strict";
     var nextClockID = 0,
-        clockTemplate = document.getElementById('clock-template'),
-        clocksContainer = document.getElementById('clocks');
-    document.getElementById('clock-add').onclick = function () {
-        // Copy clock-template
-        var newClockElement = clockTemplate.cloneNode(true);
-        clocksContainer.appendChild(newClockElement);
+        clockTemplate = $('#clock-template'),
+        clocksContainer = $('#clocks');
+    $('#clock-add').click(function () {
+        // Copy clock-template and append to clocksContainer
+        var newClockElem = clockTemplate.clone().appendTo(clocksContainer);
         // Change its clock id
-        newClockElement.setAttribute("id", "clock-" + (++nextClockID));
+        newClockElem.attr("id", "clock-" + (++nextClockID));
+        // Change clock name
+        newClockElem.find('.clock-name').text = "Clock " + nextClockID;
         // Unhide it
-        newClockElement.style.display = '';
+        newClockElem.show();
         // Create new Clock obj
         var ClockObj = new PunchClock();
-        ClockObj.timeElement = newClockElement.getElementsByClassName('clock-time')[0];
+        ClockObj.timeElement = newClockElem.find('.clock-time');
         ClockObj.Reset();
-        newClockElement.getElementsByClassName('clock-start')[0].onclick = ClockObj.Start.bind(ClockObj);
-        newClockElement.getElementsByClassName('clock-stop')[0].onclick = ClockObj.Stop.bind(ClockObj);
-        newClockElement.getElementsByClassName('clock-reset')[0].onclick = ClockObj.Reset.bind(ClockObj);
-        newClockElement.getElementsByClassName('clock-delete')[0].onclick = ClockObj.Delete.bind(ClockObj);
-        ClockObj.element = newClockElement;
-    };
-};
+        newClockElem.find('.clock-start').click($.proxy(ClockObj.Start, ClockObj));
+        newClockElem.find('.clock-stop').click($.proxy(ClockObj.Stop, ClockObj));
+        newClockElem.find('.clock-reset').click($.proxy(ClockObj.Reset, ClockObj));
+        newClockElem.find('.clock-delete').click($.proxy(ClockObj.Delete, ClockObj));
+        ClockObj.element = newClockElem;
+    });
+});
