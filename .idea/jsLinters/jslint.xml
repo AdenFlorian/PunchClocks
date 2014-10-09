@@ -7,8 +7,9 @@
     <option maxerr="50" />
     <option maxlen="80" />
     <option plusplus="true" />
-    <option predef="Element, $" />
+    <option predef="Element, $, module, PunchClock" />
+    <option sloppy="true" />
     <option vars="true" />
+    <option white="true" />
   </component>
 </project>
-

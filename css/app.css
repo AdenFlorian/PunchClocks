@@ -57,3 +57,8 @@ button:hover {
     display: inline-block;
     width: 350px;
 }
+
+/* Footer */
+footer {
+    text-align: center;
+}
