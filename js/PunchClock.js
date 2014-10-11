@@ -30,6 +30,7 @@ var PunchClock = function (newElement) {
     this.startTime = 0;
     this.time = 0;
     this.intervalID = 0;
+    this.autoCreated = true;
 
     // Set element references
     this.clockElement = newElement;
@@ -41,6 +42,7 @@ var PunchClock = function (newElement) {
     this.stopElement = this.clockElement.find('.clock-stop');
     this.resetElement = this.clockElement.find('.clock-reset');
     this.deleteElement = this.clockElement.find('.clock-delete');
+    this.addElement = 0;
 
     // Change its clock id
     this.clockElement.attr("id", "clock-" + (++PunchClock.nextID));
@@ -87,14 +89,22 @@ PunchClock.prototype.Start = function () {
 
 PunchClock.prototype.NameInputKeydown = function (event) {
     "use strict";
-    // If user pressed enter
-    if (event.which === 13) {
-        // Change clock name
-        this.Name(this.nameInputElement.val());
-        // Hide input
-        this.nameInputElement.hide();
-        // Show name
-        this.nameElement.show();
+    switch (event.which) {
+        case 13: // Enter key
+            this.autoCreated = false;
+            this.Name(this.nameInputElement.val());
+            this.nameInputElement.hide();
+            this.nameElement.show();
+            this.addElement.click();
+            break;
+        case 27: // Escape key
+            if (this.autoCreated) this.Delete();
+            break;
+        default:
+            break;
+    }
+    if (this.autoCreated) {
+        this.autoCreated = false;
     }
     // So user can type stuff without activateing a keybind/hotkey/shortcut
     event.stopPropagation();
@@ -102,10 +112,14 @@ PunchClock.prototype.NameInputKeydown = function (event) {
 
 PunchClock.prototype.NameInputFocusout = function () {
     "use strict";
-    // Hide input
-    this.nameInputElement.hide();
-    // Show name
-    this.nameElement.show();
+    if (this.autoCreated) {
+        this.Delete();
+    } else {
+        // Hide input
+        this.nameInputElement.hide();
+        // Show name
+        this.nameElement.show();
+    }
 };
 
 PunchClock.prototype.NameClick = function () {

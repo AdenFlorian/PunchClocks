@@ -31,7 +31,7 @@ $(function () {
     // Setup keybinds
     $(document).keydown(function (event) {
         switch (event.which) {
-            case 65:
+            case 65:    // A
                 addButton.click();
                 break;
             default:
@@ -49,6 +49,7 @@ $(function () {
         newClockElem.show();
         // Create new Clock obj with new clock element
         var ClockObj = new PunchClock(newClockElem);
+        ClockObj.addElement = addButton;
         console.log(ClockObj);
     });
     addButton.click();
