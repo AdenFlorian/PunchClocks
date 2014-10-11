@@ -21,6 +21,9 @@ app/sass/bourbon/
 # Vagrant
 /.vagrant
 
+# Sublime Text
+*.sublime-*
+
 # Other
 .DS_Store
 Thumbs.db
